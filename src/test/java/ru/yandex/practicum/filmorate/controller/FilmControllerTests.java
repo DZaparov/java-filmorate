@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FilmControllerTests {
     private final FilmController filmController = new FilmController();
-    ;
 
     @Test
     void validateFalseIfFilmWithEmptyNameTest() {
