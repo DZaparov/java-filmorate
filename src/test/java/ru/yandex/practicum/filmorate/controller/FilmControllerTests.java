@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -10,12 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FilmControllerTests {
-    private FilmController filmController;
-
-    @BeforeEach
-    void BeforeEach() {
-        filmController = new FilmController();
-    }
+    private final FilmController filmController = new FilmController();
+    ;
 
     @Test
     void validateFalseIfFilmWithEmptyNameTest() {

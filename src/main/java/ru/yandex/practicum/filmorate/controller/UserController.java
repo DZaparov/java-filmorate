@@ -21,8 +21,8 @@ import java.util.Set;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-    Validator validator = validatorFactory.getValidator();
+    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    private final Validator validator = validatorFactory.getValidator();
     private Integer id = 0;
     private final Map<Integer, User> users = new HashMap<>();
 

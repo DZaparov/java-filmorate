@@ -21,8 +21,8 @@ import java.util.Set;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-    Validator validator = validatorFactory.getValidator();
+    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    private final Validator validator = validatorFactory.getValidator();
     private Integer id = 0;
     private final Map<Integer, Film> films = new HashMap<>();
 
