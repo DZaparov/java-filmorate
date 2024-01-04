@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.*;
 import java.util.ArrayList;
@@ -18,51 +18,51 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/films")
+@RequestMapping("/users")
 @Slf4j
-public class FilmController {
+public class UserController {
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     private Integer id = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @GetMapping
-    public List<Film> listFilms() {
-        return new ArrayList<>(films.values());
+    public List<User> listUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
-        validateFilm(film);
-        films.put(film.getId(), film);
-        log.info("Создан фильм: {}", film);
+    public User createUser(@Valid @RequestBody User user) {
+        validateUser(user);
+        users.put(user.getId(), user);
+        log.info("Создан пользователь: {}", user);
 
-        return film;
+        return user;
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            validateFilm(film);
-            films.put(film.getId(), film);
+    public User updateUser(@Valid @RequestBody User user) {
+        if (users.containsKey(user.getId())) {
+            validateUser(user);
+            users.put(user.getId(), user);
         } else {
-            log.warn("Фильм не найден с id {} не найден", film.getId());
-            throw new ValidationException("Фильм не найден");
+            log.warn("Пользователь не найден с id {} не найден", user.getId());
+            throw new ValidationException("Пользователь не найден");
         }
-        return film;
+        return user;
     }
 
-    public void validateFilm(Film film) {
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+    public void validateUser(User user) {
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
 
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<Film> violation : violations) {
+            for (ConstraintViolation<User> violation : violations) {
                 log.warn("Валидация поля {} = '{}' не пройдена: {}", violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage());
             }
             throw new ValidationException("Валидация не пройдена");
         }
 
-        if (film.getId() == null) {
-            film.setId(++id);
+        if (user.getId() == null) {
+            user.setId(++id);
         }
     }
 }
