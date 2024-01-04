@@ -21,8 +21,7 @@ import java.util.Set;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-    private final Validator validator = validatorFactory.getValidator();
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     private Integer id = 0;
     private final Map<Integer, User> users = new HashMap<>();
 
@@ -33,16 +32,17 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        if (validateUser(user)) {
-            users.put(user.getId(), user);
-            log.info("Создан пользователь: {}", user);
-        }
+        validateUser(user);
+        users.put(user.getId(), user);
+        log.info("Создан пользователь: {}", user);
+
         return user;
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        if (validateUser(user) && users.containsKey(user.getId())) {
+        if (users.containsKey(user.getId())) {
+            validateUser(user);
             users.put(user.getId(), user);
         } else {
             log.warn("Пользователь не найден с id {} не найден", user.getId());
@@ -51,7 +51,7 @@ public class UserController {
         return user;
     }
 
-    public boolean validateUser(User user) {
+    public void validateUser(User user) {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
 
         if (!violations.isEmpty()) {
@@ -64,6 +64,5 @@ public class UserController {
         if (user.getId() == null) {
             user.setId(++id);
         }
-        return true;
     }
 }

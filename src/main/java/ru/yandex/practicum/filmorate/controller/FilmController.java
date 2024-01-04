@@ -21,8 +21,7 @@ import java.util.Set;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-    private final Validator validator = validatorFactory.getValidator();
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     private Integer id = 0;
     private final Map<Integer, Film> films = new HashMap<>();
 
@@ -33,16 +32,17 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        if (validateFilm(film)) {
-            films.put(film.getId(), film);
-            log.info("Создан фильм: {}", film);
-        }
+        validateFilm(film);
+        films.put(film.getId(), film);
+        log.info("Создан фильм: {}", film);
+
         return film;
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (validateFilm(film) && films.containsKey(film.getId())) {
+        if (films.containsKey(film.getId())) {
+            validateFilm(film);
             films.put(film.getId(), film);
         } else {
             log.warn("Фильм не найден с id {} не найден", film.getId());
@@ -51,7 +51,7 @@ public class FilmController {
         return film;
     }
 
-    public boolean validateFilm(Film film) {
+    public void validateFilm(Film film) {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         if (!violations.isEmpty()) {
@@ -64,6 +64,5 @@ public class FilmController {
         if (film.getId() == null) {
             film.setId(++id);
         }
-        return true;
     }
 }
