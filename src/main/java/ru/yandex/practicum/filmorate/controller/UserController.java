@@ -1,68 +1,59 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private Integer id = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    public final UserService userService;
 
-    @GetMapping
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping()
     public List<User> listUsers() {
-        return new ArrayList<>(users.values());
+        return userService.listUsers();
     }
 
-    @PostMapping
+    @GetMapping("/{id}")
+    public User findById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PostMapping()
     public User createUser(@Valid @RequestBody User user) {
-        validateUser(user);
-        users.put(user.getId(), user);
-        log.info("Создан пользователь: {}", user);
-
-        return user;
+        return userService.createUser(user);
     }
 
-    @PutMapping
+    @PutMapping()
     public User updateUser(@Valid @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            validateUser(user);
-            users.put(user.getId(), user);
-        } else {
-            log.warn("Пользователь не найден с id {} не найден", user.getId());
-            throw new ValidationException("Пользователь не найден");
-        }
-        return user;
+        return userService.updateUser(user);
     }
 
-    public void validateUser(User user) {
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<User> violation : violations) {
-                log.warn("Валидация поля {} = '{}' не пройдена: {}", violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage());
-            }
-            throw new ValidationException("Валидация не пройдена");
-        }
-
-        if (user.getId() == null) {
-            user.setId(++id);
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.addFriend(id, friendId);
     }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> listFriends(@PathVariable Long id) {
+        return userService.listFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> listCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.listCommonFriends(id, otherId);
+    }
+
 }
