@@ -35,8 +35,8 @@ public class UserService {
         return userStorage.createUser(user);
     }
 
-    public User getUserById(Long Id) {
-        return userStorage.getUserById(Id);
+    public User getUserById(Long id) {
+        return userStorage.getUserById(id);
     }
 
     public User updateUser(User user) {
