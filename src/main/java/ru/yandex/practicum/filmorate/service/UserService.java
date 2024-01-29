@@ -3,13 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +15,6 @@ import java.util.Set;
 public class UserService {
     private Long id = 0L;
     private final UserStorage userStorage;
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -31,7 +26,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        validateUser(user);
+        generateUserId(user);
         return userStorage.createUser(user);
     }
 
@@ -40,7 +35,7 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        validateUser(userStorage.getUserById(user.getId()));
+        generateUserId(userStorage.getUserById(user.getId()));
         return userStorage.updateUser(user);
     }
 
@@ -85,20 +80,9 @@ public class UserService {
         return result;
     }
 
-    public void validateUser(User user) {
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<User> violation : violations) {
-                log.warn("Валидация поля {} = '{}' не пройдена: {}", violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage());
-            }
-            throw new ValidationException("Валидация не пройдена");
-        }
-
+    public void generateUserId(User user) {
         if (user.getId() == null) {
             user.setId(++id);
         }
     }
-
-
 }

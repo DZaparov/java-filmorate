@@ -3,19 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +19,6 @@ public class FilmService {
     private Long id = 0L;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -37,7 +31,7 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        validateFilm(film);
+        generateFilmId(film);
         return filmStorage.createFilm(film);
     }
 
@@ -46,7 +40,7 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        validateFilm(filmStorage.getFilmById(film.getId()));
+        generateFilmId(filmStorage.getFilmById(film.getId()));
         return filmStorage.updateFilm(film);
     }
 
@@ -79,16 +73,7 @@ public class FilmService {
         return result;
     }
 
-    public void validateFilm(Film film) {
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<Film> violation : violations) {
-                log.warn("Валидация поля {} = '{}' не пройдена: {}", violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage());
-            }
-            throw new ValidationException("Валидация не пройдена");
-        }
-
+    public void generateFilmId(Film film) {
         if (film.getId() == null) {
             film.setId(++id);
         }
