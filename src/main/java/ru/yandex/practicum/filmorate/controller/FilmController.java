@@ -1,68 +1,71 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private Integer id = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
+    public final FilmService filmService;
 
-    @GetMapping
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
+
+    @GetMapping()
     public List<Film> listFilms() {
-        return new ArrayList<>(films.values());
+        List<Film> result = filmService.listFilms();
+        log.info("Получен список фильмов. Количество: " + result.size());
+        return result;
     }
 
-    @PostMapping
+    @GetMapping("/{id}")
+    public Film findById(@PathVariable Long id) {
+        Film result = filmService.getFilmById(id);
+        log.info("Получен фильм: " + result);
+        return result;
+    }
+
+    @PostMapping()
     public Film createFilm(@Valid @RequestBody Film film) {
-        validateFilm(film);
-        films.put(film.getId(), film);
-        log.info("Создан фильм: {}", film);
-
-        return film;
+        Film result = filmService.createFilm(film);
+        log.info("Создан фильм: " + result);
+        return result;
     }
 
-    @PutMapping
+    @PutMapping()
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            validateFilm(film);
-            films.put(film.getId(), film);
-        } else {
-            log.warn("Фильм не найден с id {} не найден", film.getId());
-            throw new ValidationException("Фильм не найден");
-        }
-        return film;
+        Film result = filmService.updateFilm(film);
+        log.info("Обновлен фильм: " + result);
+        return result;
     }
 
-    public void validateFilm(Film film) {
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
+        Film result = filmService.addLike(id, userId);
+        log.info("Пользователь с id=" + userId + " поставил лайк фильму: " + result);
+        return result;
+    }
 
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<Film> violation : violations) {
-                log.warn("Валидация поля {} = '{}' не пройдена: {}", violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage());
-            }
-            throw new ValidationException("Валидация не пройдена");
-        }
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        Film result = filmService.removeLike(id, userId);
+        log.info("Пользователь с id=" + userId + " удалил лайк у фильма: " + result);
+        return result;
+    }
 
-        if (film.getId() == null) {
-            film.setId(++id);
-        }
+    @GetMapping("/popular")
+    public List<Film> listPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        List<Film> result = filmService.listPopularFilms(count);
+        log.info("Запрошено популярных фильмов: " + count + " Получено фильмов: " + result.size());
+        return result;
     }
 }
