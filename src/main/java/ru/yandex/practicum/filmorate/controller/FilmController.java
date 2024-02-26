@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.*;
 import java.util.*;
@@ -14,10 +15,12 @@ import java.util.*;
 @Slf4j
 public class FilmController {
     public final FilmService filmService;
+    public final UserService userService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, UserService userService) {
         this.filmService = filmService;
+        this.userService = userService;
     }
 
     @GetMapping()
@@ -49,23 +52,24 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
-        Film result = filmService.addLike(id, userId);
-        log.info("Пользователь с id=" + userId + " поставил лайк фильму: " + result);
-        return result;
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        userService.getUserById(userId);
+        filmService.getFilmById(id);
+        filmService.addLike(id, userId);
+        log.info("Пользователь с id=" + userId + " поставил лайк фильму с id=: " + id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        Film result = filmService.removeLike(id, userId);
-        log.info("Пользователь с id=" + userId + " удалил лайк у фильма: " + result);
-        return result;
+    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.removeLike(id, userId);
+        log.info("Пользователь с id=" + userId + " удалил лайк у фильма: " + id);
     }
 
     @GetMapping("/popular")
     public List<Film> listPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Запрошено популярных фильмов: " + count);
         List<Film> result = filmService.listPopularFilms(count);
-        log.info("Запрошено популярных фильмов: " + count + " Получено фильмов: " + result.size());
+        log.info("Получено фильмов: " + result.size());
         return result;
     }
 }

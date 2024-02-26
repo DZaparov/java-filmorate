@@ -3,20 +3,20 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserService {
-    private Long id = 0L;
     private final UserStorage userStorage;
+    private final FriendsStorage friendsStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     public List<User> listUsers() {
@@ -24,7 +24,6 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        generateUserId(user);
         return userStorage.createUser(user);
     }
 
@@ -33,54 +32,23 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        generateUserId(userStorage.getUserById(user.getId()));
         return userStorage.updateUser(user);
     }
 
     public void addFriend(Long id, Long friendId) {
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
-
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+        friendsStorage.addFriend(id, friendId);
     }
 
     public void removeFriend(Long id, Long friendId) {
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
-
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+        friendsStorage.removeFriend(id, friendId);
     }
 
     public List<User> listFriends(Long id) {
-        List<User> result = new ArrayList<>();
-
-        User user = getUserById(id);
-        for (Long friendId : user.getFriends()) {
-            result.add(getUserById(friendId));
-        }
-
-        return result;
+        return friendsStorage.listFriends(id);
     }
 
     public List<User> listCommonFriends(Long id, Long otherId) {
-        List<User> result = new ArrayList<>();
-
-        Set<Long> friends = getUserById(id).getFriends();
-        Set<Long> otherFriends = getUserById(otherId).getFriends();
-
-        for (Long friendId : friends) {
-            if (otherFriends.contains(friendId)) {
-                result.add(getUserById(friendId));
-            }
-        }
-        return result;
+        return friendsStorage.listCommonFriends(id, otherId);
     }
 
-    public void generateUserId(User user) {
-        if (user.getId() == null) {
-            user.setId(++id);
-        }
-    }
 }
