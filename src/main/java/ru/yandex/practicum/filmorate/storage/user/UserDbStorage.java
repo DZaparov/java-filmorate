@@ -65,12 +65,12 @@ public class UserDbStorage implements UserStorage {
                 "email = ?, login = ?, name = ?, birthday = ? " +
                 "WHERE id = ?";
         log.warn("Попытка обновления пользователя {}", user);
-        int recordsAffected = jdbcTemplate.update(sqlQuery
-                , user.getEmail()
-                , user.getLogin()
-                , user.getName()
-                , user.getBirthday()
-                , user.getId()
+        int recordsAffected = jdbcTemplate.update(sqlQuery,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId()
         );
         if (recordsAffected == 0) {
             log.warn("Обновление пользователя - Пользователь с id {} не найден", user.getId());
