@@ -66,13 +66,13 @@ public class FilmDbStorage implements FilmStorage {
                 "name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? " +
                 "WHERE id = ?";
 
-        int recordsAffected = jdbcTemplate.update(sqlQuery
-                , film.getName()
-                , film.getDescription()
-                , film.getReleaseDate()
-                , film.getDuration()
-                , film.getMpa().getId()
-                , film.getId()
+        int recordsAffected = jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId()
         );
         if (recordsAffected == 0) {
             log.warn("Обновление фильма - Фильм с id {} не найден", film.getId());
