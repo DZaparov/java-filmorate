@@ -6,14 +6,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 
-@Component
 @Primary
 @Repository
 @Slf4j
@@ -30,7 +28,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "SELECT fs.*, m.mpa_name " +
                 "FROM FILMS fs " +
                 "LEFT JOIN MPA m ON fs.mpa_id = m.id ";
-        return jdbcTemplate.query(sqlQuery, new MapRowToFilm());
+        return jdbcTemplate.query(sqlQuery, MapRowToFilm::mapRow);
     }
 
     @Override
@@ -51,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE fs.id = ?";
         Film film;
         try {
-            film = jdbcTemplate.queryForObject(sqlQuery, new MapRowToFilm(), id);
+            film = jdbcTemplate.queryForObject(sqlQuery, MapRowToFilm::mapRow, id);
         } catch (EmptyResultDataAccessException e) {
             log.warn("Фильм с id {} не найден", id);
             throw new NotFoundException("Фильм с id " + id + " не найден");

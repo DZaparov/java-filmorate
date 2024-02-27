@@ -4,14 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 
-@Component
 @Primary
 @Repository
 @Slf4j
@@ -66,6 +64,6 @@ public class LikesDbStorage implements LikesStorage {
                 "ORDER BY COUNT(ls.film_id) DESC " +
                 "LIMIT ?" +
                 ")";
-        return jdbcTemplate.query(sqlQuery, new MapRowToFilm(), count);
+        return jdbcTemplate.query(sqlQuery, MapRowToFilm::mapRow, count);
     }
 }

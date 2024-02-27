@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,14 +13,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component
 @Primary
 @Repository
 @Slf4j
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -30,7 +26,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> listUsers() {
         String sqlQuery = "SELECT * FROM users";
-        return jdbcTemplate.query(sqlQuery, new MapRowToUser());
+        return jdbcTemplate.query(sqlQuery, MapRowToUser::mapRow);
     }
 
     @Override
@@ -50,7 +46,7 @@ public class UserDbStorage implements UserStorage {
                 "WHERE id = ?";
         User user;
         try {
-            user = jdbcTemplate.queryForObject(sqlQuery, new MapRowToUser(), id);
+            user = jdbcTemplate.queryForObject(sqlQuery, MapRowToUser::mapRow, id);
         } catch (EmptyResultDataAccessException e) {
             log.warn("Пользователь с id {} не найден", id);
             throw new NotFoundException("Пользователь с id " + id + " не найден");

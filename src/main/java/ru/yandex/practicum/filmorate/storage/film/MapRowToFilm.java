@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -9,9 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 
-public class MapRowToFilm implements RowMapper<Film> {
-    @Override
-    public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException, NotFoundException {
+public class MapRowToFilm {
+
+    public static Film mapRow(ResultSet resultSet, int rowNum) throws SQLException, NotFoundException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))

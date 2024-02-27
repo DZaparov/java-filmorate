@@ -4,14 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
-@Component
 @Primary
 @Repository
 @Slf4j
@@ -59,7 +57,7 @@ public class FriendsDbStorage implements FriendsStorage {
                 "FROM friends f " +
                 "LEFT JOIN users u ON f.followed_user_id = u.id " +
                 "WHERE f.following_user_id = ?";
-        List<User> friendsList = jdbcTemplate.query(sqlQuery, new MapRowToUser(), userId);
+        List<User> friendsList = jdbcTemplate.query(sqlQuery, MapRowToUser::mapRow, userId);
         log.info("Список друзей пользователя id={}: {}", userId, friendsList);
         return friendsList;
     }
@@ -74,7 +72,7 @@ public class FriendsDbStorage implements FriendsStorage {
                 "GROUP BY followed_user_id " +
                 "HAVING COUNT(followed_user_id) = 2" +
                 ")";
-        List<User> friendsList = jdbcTemplate.query(sqlQuery, new MapRowToUser(), id, otherId);
+        List<User> friendsList = jdbcTemplate.query(sqlQuery, MapRowToUser::mapRow, id, otherId);
         log.info("Список общих друзей пользователей id={} и {}: {}", id, otherId, friendsList);
         return friendsList;
     }
