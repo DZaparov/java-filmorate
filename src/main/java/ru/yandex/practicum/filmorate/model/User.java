@@ -1,16 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @ToString
+@Builder
 public class User {
     @EqualsAndHashCode.Exclude
     private Long id;
@@ -24,7 +26,6 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Long> friends = new TreeSet<>();
 
     public User(Long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -36,5 +37,14 @@ public class User {
         if (this.name == null || this.name.isBlank()) {
             this.name = login;
         }
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", email);
+        values.put("login", login);
+        values.put("name", name);
+        values.put("birthday", birthday);
+        return values;
     }
 }

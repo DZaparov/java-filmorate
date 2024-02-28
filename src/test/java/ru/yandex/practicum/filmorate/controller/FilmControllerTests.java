@@ -17,7 +17,7 @@ public class FilmControllerTests {
     @Test
     void validateThrowsIfFilmWithEmptyNameTest() {
         try {
-            Film film = new Film(null, "", "Описание", LocalDate.of(2000, 12, 12), 26);
+            Film film = new Film(null, "", "Описание", LocalDate.of(2000, 12, 12), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertFalse(violations.isEmpty());
         } catch (Exception ignored) {
@@ -27,7 +27,7 @@ public class FilmControllerTests {
     @Test
     void validateDoesNotThrowIfFilmWithNoEmptyNameTest() {
         try {
-            Film film = new Film(null, "Название", "Описание", LocalDate.of(2000, 12, 12), 26);
+            Film film = new Film(null, "Название", "Описание", LocalDate.of(2000, 12, 12), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertTrue(violations.isEmpty());
         } catch (Exception ignored) {
@@ -41,7 +41,7 @@ public class FilmControllerTests {
                     "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
                             "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
                             "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
-                            "ОписаниеОписаниеОписаниеОписание1", LocalDate.of(2000, 12, 12), 26);
+                            "ОписаниеОписаниеОписаниеОписание1", LocalDate.of(2000, 12, 12), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertFalse(violations.isEmpty());
         } catch (Exception ignored) {
@@ -55,7 +55,7 @@ public class FilmControllerTests {
                     "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
                             "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
                             "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание" +
-                            "ОписаниеОписаниеОписаниеОписание", LocalDate.of(2000, 12, 12), 26);
+                            "ОписаниеОписаниеОписаниеОписание", LocalDate.of(2000, 12, 12), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertTrue(violations.isEmpty());
         } catch (Exception ignored) {
@@ -65,7 +65,7 @@ public class FilmControllerTests {
     @Test
     void validateThrowsIfFilmWithDateBefore28dec1895Test() {
         try {
-            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 27), 26);
+            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 27), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertFalse(violations.isEmpty());
         } catch (Exception ignored) {
@@ -75,7 +75,7 @@ public class FilmControllerTests {
     @Test
     void validateDoesNotThrowIfFilmWithDate28dec1895Test() {
         try {
-            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 26);
+            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertTrue(violations.isEmpty());
         } catch (Exception ignored) {
@@ -85,13 +85,13 @@ public class FilmControllerTests {
     @Test
     void validateThrowsIfFilmDurationIsZeroOrMinusTest() {
         try {
-            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 0);
+            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 0, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertFalse(violations.isEmpty());
         } catch (Exception ignored) {
         }
         try {
-            Film film2 = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), -1);
+            Film film2 = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), -1, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film2);
             assertFalse(violations.isEmpty());
         } catch (Exception ignored) {
@@ -101,7 +101,7 @@ public class FilmControllerTests {
     @Test
     void validateDoesNotThrowIfFilmDurationIsPlusTest() {
         try {
-            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 26);
+            Film film = new Film(null, "Название", "Описание", LocalDate.of(1895, 12, 28), 26, null, null);
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             assertTrue(violations.isEmpty());
         } catch (Exception ignored) {
